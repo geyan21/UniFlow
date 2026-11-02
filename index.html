@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UniFlow: A Unified Multi-Modal Policy for Robot Manipulation · CoRL 2026</title>
+<meta name="description" content="UniFlow treats 3D as an image: pointmaps let pretrained 2D backbones encode geometry as well as RGB, and one diffusion transformer fuses the two streams into a small manipulation policy that stays robust when lighting, textures, backgrounds and cameras change. With no robot data pretraining, it outperforms the large-scale pretrained VLA π0.5 on average, on RoboTwin and on a real bimanual robot. CoRL 2026.">
+<meta name="theme-color" content="#f6f6ef">
+<meta property="og:type" content="website">
+<meta property="og:title" content="UniFlow: A Unified Multi-Modal Policy for Robot Manipulation">
+<meta property="og:description" content="Treat 3D as an image: pretrained 2D encoders encode both RGB and pointmaps, fused in one diffusion transformer. With no robot data pretraining, the small UniFlow policy outperforms the pretrained VLA π0.5 on average. CoRL 2026.">
+<meta property="og:url" content="https://geyan21.github.io/UniFlow/">
+<meta property="og:image" content="https://geyan21.github.io/UniFlow/assets/img/og.jpg?v=4">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="UniFlow: A Unified Multi-Modal Policy for Robot Manipulation, CoRL 2026">
+<link rel="canonical" href="https://geyan21.github.io/UniFlow/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="UniFlow: A Unified Multi-Modal Policy for Robot Manipulation">
+<meta name="twitter:description" content="Treat 3D as an image: pretrained 2D encoders encode both RGB and pointmaps, fused in one diffusion transformer. With no robot data pretraining, the small UniFlow policy outperforms the pretrained VLA π0.5 on average. CoRL 2026.">
+<meta name="twitter:image" content="https://geyan21.github.io/UniFlow/assets/img/og.jpg?v=4">
+<link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="preload" href="assets/fonts/SourceSerif4-latin-roman.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/style.css">
+<script>document.documentElement.classList.add("js")</script>
+<script type="module" src="assets/js/main.js"></script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M7 4.8v14.4c0 .8.9 1.3 1.6.8l11-7.2a1 1 0 0 0 0-1.6l-11-7.2C7.9 3.5 7 4 7 4.8z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="4.5" width="4" height="15" rx="1.2" fill="currentColor"/><rect x="14" y="4.5" width="4" height="15" rx="1.2" fill="currentColor"/></symbol>
+  <symbol id="i-full" viewBox="0 0 24 24"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor" opacity=".25"/><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-cross" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor" opacity=".25"/><path d="M8.5 8.5l7 7m0-7l-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-paper" viewBox="0 0 24 24"><path d="M7 3h7l5 5v12a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M14 3v5h5M8.5 13h7M8.5 16.5h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="M8.5 7L3.5 12l5 5M15.5 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-quote" viewBox="0 0 24 24"><path d="M5 6h5v5l-2.5 6H5l2-6H5zM14 6h5v5l-2.5 6H14l2-6h-2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+  <symbol id="i-lr" viewBox="0 0 24 24"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-prev" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M8 16L16.5 7.5M9.5 7H17v7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+</svg>
+
+<a class="skip" href="#overview">Skip to content</a>
+
+<header class="topbar" id="nav">
+  <div class="topbar-in">
+    <a class="brand" href="#top">UniFlow</a>
+    <span class="topbar-title" aria-hidden="true">A Unified Multi-Modal Policy for Robot Manipulation</span>
+    <nav class="toplinks" aria-label="Links">
+      <a href="https://openreview.net/pdf?id=o03EddNo6r" target="_blank" rel="noopener" title="Paper on OpenReview">Paper<svg class="ext" aria-hidden="true"><use href="#i-ext"/></svg></a>
+      <a href="https://github.com/geyan21/UniFlow" target="_blank" rel="noopener">Code</a>
+      <a href="#bibtex">BibTeX</a>
+    </nav>
+    <button class="menu" id="menubtn" aria-label="Sections" aria-expanded="false" aria-controls="toc"><svg><use href="#i-menu"/></svg></button>
+  </div>
+  <div class="progress" id="progress"></div>
+</header>
+
+<main id="main">
+<!-- ======================================================= HERO VIDEO -->
+<section class="hero" id="top">
+  <div class="theater paused" id="theater">
+    <video id="teaser" muted loop playsinline preload="metadata" poster="assets/img/teaser_poster.jpg" aria-label="UniFlow overview video"></video>
+    <div class="placeholder" id="teaser-ph" hidden><p>Overview video coming soon</p></div>
+    <button class="bigplay" id="teaser-big" aria-label="Play the overview video"><span><svg><use href="#i-play"/></svg></span></button>
+    <div class="controls">
+      <button class="iconbtn" id="teaser-play" aria-label="Pause"><svg><use href="#i-pause"/></svg></button>
+      <button class="iconbtn" id="teaser-full" aria-label="Full screen"><svg><use href="#i-full"/></svg></button>
+    </div>
+    <div class="tbar"><i id="teaser-bar"></i></div>
+    <div class="scroll-cue" aria-hidden="true">scroll to explore<i></i></div>
+  </div>
+</section>
+
+<!-- ======================================================= TITLE -->
+<header class="titleblock" id="title">
+  <h1><span class="name">UniFlow</span>: A Unified Multi-Modal Policy for Robot&nbsp;Manipulation</h1>
+  <p class="subtitle">Treat 3D as an image, and geometry inherits 2D pretraining.</p>
+  <p class="authors">
+    <a href="https://geyan21.github.io/" target="_blank" rel="noopener">Ge Yan</a><sup>1</sup><span class="sep">,</span>
+    <a href="https://sh8.io/" target="_blank" rel="noopener">Shun Iwase</a><sup>2</sup><span class="sep">,</span>
+    <a href="https://yolo12138.github.io/" target="_blank" rel="noopener">Yuzhi Fan</a><sup>1</sup><span class="sep">,</span>
+    <a href="https://homes.cs.washington.edu/~fox/" target="_blank" rel="noopener">Dieter Fox</a><sup>1,3</sup><span class="sep">,</span>
+    <a href="https://zakharos.github.io/" target="_blank" rel="noopener">Sergey Zakharov</a><sup>2</sup><span class="sep">,</span>
+    <a href="https://www.thekatherineliu.com/" target="_blank" rel="noopener">Katherine Liu</a><sup>2</sup>
+  </p>
+  <p class="affils"><span><sup>1</sup>University of Washington</span><span><sup>2</sup>Toyota Research Institute</span><span><sup>3</sup>Allen Institute for AI</span></p>
+  <p class="venue">Conference on Robot Learning (CoRL) 2026</p>
+  <div class="cta">
+    <a class="pillbtn" href="https://openreview.net/pdf?id=o03EddNo6r" target="_blank" rel="noopener"><svg><use href="#i-paper"/></svg>Paper</a>
+    <a class="pillbtn" href="https://github.com/geyan21/UniFlow" target="_blank" rel="noopener"><svg><use href="#i-code"/></svg>Code</a>
+    <a class="pillbtn" href="#bibtex"><svg><use href="#i-quote"/></svg>BibTeX</a>
+  </div>
+</header>
+
+<div class="page">
+<!-- ======================================================= LEFT NAV -->
+<aside class="toc" id="toc" aria-label="Sections">
+  <ul>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#abstract">Abstract</a></li>
+    <li><a href="#pointmaps">An image of geometry</a></li>
+    <li><a href="#method">How it works</a></li>
+    <li><a href="#lbm">Robust under shift</a>
+      <ul>
+        <li><a href="#lbm-rollouts">Rollouts</a></li>
+        <li><a href="#lbm-tasks">Per task</a></li>
+        <li><a href="#shift">One shift at a time</a></li>
+      </ul>
+    </li>
+    <li><a href="#robotwin">RoboTwin</a></li>
+    <li><a href="#real">Real world</a></li>
+    <li><a href="#ablations">Ablations</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+    <li><a href="#bibtex">BibTeX</a></li>
+  </ul>
+</aside>
+
+<div class="content">
+<!-- ======================================================= OVERVIEW -->
+<section class="sec" id="overview">
+  <h2 class="sr-only">Overview</h2>
+  <div class="tldr reveal">
+    <div class="tldr-copy">
+      <p class="tldr-label">TL;DR</p>
+      <p class="tldr-text">UniFlow represents <em class="tldr-key">3D as an image</em>, a pointmap of the 3D point <span class="tldr-geo">(<var>x</var>, <var>y</var>, <var>z</var>)</span> seen at each pixel of the RGB image, so pretrained 2D encoders can encode both without needing a pretrained 3D encoder. It stays robust under scene shifts and, with no robot data pretraining, learns four real tasks from <span class="tldr-nb">about an hour</span> of demonstrations, beating the <span class="tldr-nb">large-scale</span> pretrained <span class="tldr-nb">π<sub>0.5</sub> on average.</span></p>
+    </div>
+    <figure class="ins-vis" role="img" aria-label="An RGB image and its pointmap drawn as two stacked layers of the same pixel grid; one pixel on the plate is marked in both">
+      <div class="ins-stage">
+        <svg class="ins-stack" viewBox="0 0 435.2 302" aria-hidden="true">
+          <defs>
+            <clipPath id="ins-clip"><rect width="640" height="360" rx="10"/></clipPath>
+            <filter id="ins-blur" x="-20%" y="-30%" width="140%" height="170%"><feGaussianBlur stdDeviation="7"/></filter>
+          </defs>
+          <polygon class="ins-shadow" points="47.2,190 431.2,190 388,298 4,298"/><g transform="matrix(0.6 0 -0.12 0.3 47.2 190)"><image href="assets/img/arch-pmap.webp" width="640" height="360" preserveAspectRatio="none" clip-path="url(#ins-clip)"/><rect class="ins-edge" width="640" height="360" rx="10"/></g>
+          <g class="ins-guides"><line x1="47.2" y1="30" x2="47.2" y2="190"/><line x1="431.2" y1="30" x2="431.2" y2="190"/><line x1="388" y1="138" x2="388" y2="298"/><line x1="4" y1="138" x2="4" y2="298"/></g>
+          <polygon class="ins-shadow" points="47.2,30 431.2,30 388,138 4,138"/><g transform="matrix(0.6 0 -0.12 0.3 47.2 30)"><image href="assets/img/arch-rgb.webp" width="640" height="360" preserveAspectRatio="none" clip-path="url(#ins-clip)"/><rect class="ins-edge" width="640" height="360" rx="10"/></g>
+          <line class="ins-pin" x1="280.1" y1="55.2" x2="280.1" y2="215.2"/>
+          <circle class="ins-dot" cx="280.1" cy="55.2" r="4.5"/>
+          <circle class="ins-dot" cx="280.1" cy="215.2" r="4.5"/>
+        </svg>
+        <span class="ins-vl rgb" style="left:10.8%;top:9.9%">RGB image <b>(r, g, b)</b></span>
+        <span class="ins-vl geo" style="left:0.9%;top:98.7%">Pointmap <b>(x, y, z)</b></span>
+        <span class="ins-vl pin" style="left:64.4%;top:54.3%">same pixel</span>
+      </div>
+    </figure>
+    <p class="tldr-go"><a href="#pointmaps">Pointmaps</a><a href="#lbm">Domain shift</a><a href="#robotwin">RoboTwin</a><a href="#real">Real world</a></p>
+  </div>
+</section>
+
+<!-- ======================================================= ABSTRACT -->
+<section class="sec" id="abstract">
+  <div class="text reveal">
+    <h2>Abstract</h2>
+    <p>Visuomotor manipulation policies face a persistent trade-off: image-only policies inherit the semantic priors of large-scale 2D pretraining but are brittle to lighting, texture, and viewpoint shift, whereas 3D-only policies are robust to such factors yet are often trained from scratch. Some recent multi-modal policies combine both streams but typically process 3D through a from-scratch encoder, preserving this asymmetry. We present <strong>UniFlow</strong>, a unified 2D+3D co-training recipe for manipulation in which 3D observations are represented as image-shaped pointmaps (per-pixel 3D coordinates) so that pretrained 2D backbones can be used to encode both modalities, and RGB and pointmap streams are fused by a unified diffusion transformer with per-modality modulation. On average across thirteen dexterous manipulation tasks from the challenging Large Behavior Model (LBM) simulation benchmark, UniFlow outperforms a strong RGB-only baseline in a distribution-shifted setting. UniFlow also outperforms the generalist vision-language-action (VLA) model π<sub>0.5</sub> when averaged over five RoboTwin bimanual tasks as well as four real-world tasks on the bimanual YAM platform.</p>
+  </div>
+</section>
+
+<!-- ======================================================= POINTMAPS -->
+<section class="sec" id="pointmaps">
+  <div class="text reveal">
+    <h2>An image of geometry</h2>
+    <p>A <em>pointmap</em> stores, at every pixel, the 3D point that the pixel sees. It has the same shape as the camera image and lines up with it pixel for pixel, so the same kind of pretrained 2D encoder that encodes RGB can encode geometry, with no point sampling or neighbor search. Below, every frame of a real demonstration is a pointmap: drag the divider to compare it with the RGB image, then lift it into 3D.</p>
+  </div>
+  <figure class="fig wide reveal" id="pmx">
+    <div class="pmx-stage" id="pmx-stage">
+      <img class="pmx-poster" id="pmx-poster" src="assets/pm4d/plate-handoff.jpg" alt="">
+      <canvas class="gl" id="pmx-gl" role="img" aria-label="A real demonstration from the YAM head camera: the RGB image left of the divider and its pointmap right of it; in the 3D view, the same pointmap lifted into a point cloud"></canvas>
+      <div class="pmx-div" id="pmx-div" role="slider" tabindex="0" aria-label="Divider between the RGB image and its pointmap" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"><span><svg><use href="#i-lr"/></svg></span></div>
+      <span class="tag l" id="pmx-tl">RGB</span><span class="tag r" id="pmx-tr">Pointmap</span>
+      <div class="readout" id="pmx-read"><span>hover the image for</span> (x, y, z)</div>
+      <button class="iconbtn pmx-play" id="pmx-play" aria-label="Pause"><svg><use href="#i-pause"/></svg></button>
+      <div class="tbar"><i id="pmx-bar"></i></div>
+    </div>
+    <div class="pmx-controls">
+      <div class="seg" role="group" aria-label="View" id="pmx-mode">
+        <button aria-pressed="true" data-mode="wipe">Image ↔ pointmap</button>
+        <button aria-pressed="false" data-mode="3d">Lifted to 3D</button>
+      </div>
+      <div class="seg sm" role="group" aria-label="Point colors" id="pmx-color" hidden>
+        <button aria-pressed="true" data-color="rgb">RGB</button>
+        <button aria-pressed="false" data-color="height">Height</button>
+        <button aria-pressed="false" data-color="xyz">XYZ</button>
+      </div>
+      <div class="thumbs" id="pmx-thumbs" role="group" aria-label="Task"></div>
+    </div>
+    <figcaption><b>Figure 1.</b> Teleoperated demonstrations from the YAM head camera (ZED 2i stereo depth), at 2× speed. A pointmap pixel is X = (u − c<sub>x</sub>) · Z / f<sub>x</sub>, Y = (v − c<sub>y</sub>) · Z / f<sub>y</sub>, shown as (R, G, B) = (X, Y, Z); blank pixels have no stereo depth. The 3D view starts from the head camera's own pose and lens; the table behind moving objects comes from a static background accumulated over the clip, and pixels without depth are filled in flat from the depth around them.</figcaption>
+  </figure>
+</section>
+
+<!-- ======================================================= METHOD -->
+<section class="sec" id="method">
+  <div class="text reveal">
+    <h2>How it works</h2>
+    <p>RGB and pointmap tokens stay separate streams all the way into a unified diffusion transformer. Each stream keeps its own modulation and feed-forward weights, and all of them meet in one joint self-attention with the noisy action tokens. Hover a block for details.</p>
+  </div>
+  <figure class="fig wide reveal">
+    <div class="arch" id="arch" aria-label="UniFlow architecture diagram"></div>
+    <p class="arch-hint">swipe to explore the diagram →</p>
+    <figcaption><b>Figure 2.</b> UniFlow architecture. Pretrained 2D encoders encode each camera's RGB image and its pointmap; MMDiT-Any blocks give each modality its own AdaLN, attention projections and feed-forward layers around one joint attention, and a consistency flow-matching action head decodes the action chunk in a few steps.</figcaption>
+  </figure>
+  <div class="points">
+    <div class="point reveal"><span class="num">01</span><h3>Pretraining for both streams</h3><p>Because a pointmap is an image, geometry is encoded by a pretrained 2D encoder just like RGB, not by a point-cloud network trained from scratch. It needs no point sampling or neighbor search, and its tokens sit next to the RGB tokens in the same transformer.</p></div>
+    <div class="point reveal"><span class="num">02</span><h3>Separate streams, joint attention</h3><p>MMDiT-Any blocks give every stream its own adaptive layer norm, attention projections and feed-forward network, so RGB and geometry share neither statistics nor weights, while one joint self-attention lets every token see every other.</p></div>
+    <div class="point reveal"><span class="num">03</span><h3>Few-step actions</h3><p>Training with ManiFlow's consistency flow-matching objective lets the policy decode an action chunk from noise in a few Euler steps, executed receding-horizon.</p></div>
+  </div>
+</section>
+
+<!-- ======================================================= LBM -->
+<section class="sec" id="lbm">
+  <div class="text reveal">
+    <p class="eyebrow">Simulation · LBM benchmark</p>
+    <h2>Robust when the scene shifts</h2>
+    <p>Thirteen dexterous tasks from the <a href="https://toyotaresearchinstitute.github.io/lbm1/" target="_blank" rel="noopener">Large Behavior Model study</a> (Barreiros et al., <a href="https://doi.org/10.1126/scirobotics.aea6201" target="_blank" rel="noopener"><em>Science Robotics</em> 2026</a>), seven bimanual and six single-arm, in the Drake simulator. Every policy runs the same seeded scenes in-domain and under a domain shift that adds a second light, swaps the environment map, perturbs camera poses and intrinsics, re-textures objects and table, and in some scenes adds distractors. The LBM baseline is a four-camera variant of that study's RGB-only diffusion policy, trained on the same demonstrations.</p>
+    <p>Under shift, the RGB-only policy loses more than half of its success. UniFlow, which also encodes geometry, stays close to its in-domain level.</p>
+  </div>
+  <figure class="fig reveal">
+    <div class="panel chartpanel">
+      <div class="chart-head">
+        <div><p class="chart-title">Average success over 13 LBM tasks</p><p class="chart-sub">In-domain → domain shift</p></div>
+        <button class="tablebtn" data-table="slope" aria-pressed="false">Table</button>
+      </div>
+      <ul class="legend" id="slope-legend"></ul>
+      <div class="chart" id="slope"></div>
+    </div>
+  </figure>
+
+  <div class="text reveal" id="lbm-rollouts">
+    <h3>Same scene, four policies</h3>
+    <p>Pick a task and a scene: all four policies start from the same randomized state. Besides LBM and UniFlow, the panel shows UniFlow's two single-modality variants, trained with the pointmap or the RGB stream removed.</p>
+  </div>
+  <figure class="fig wide reveal">
+    <div class="panel explorer" id="explorer">
+      <div class="ex-top">
+        <div class="group">
+          <span class="lbl">Condition</span>
+          <div class="seg" role="group" aria-label="Condition" id="ex-cond">
+            <button aria-pressed="false" data-cond="IN">In-domain</button>
+            <button aria-pressed="true" data-cond="DS">Domain shift</button>
+          </div>
+        </div>
+        <div class="group">
+          <span class="lbl">Scene</span>
+          <div class="seg sm" role="group" aria-label="Initial condition" id="ex-ep"></div>
+        </div>
+      </div>
+      <div class="taskrail" id="ex-tasks" role="group" aria-label="Task"></div>
+      <div class="ex-stage" id="ex-stage"></div>
+      <div class="ex-bottom">
+        <button class="iconbtn" id="ex-play" aria-label="Play"><svg><use href="#i-play"/></svg></button>
+        <div class="scrub" id="ex-scrub" role="slider" aria-label="Time" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="rail"></div><div class="fill"></div><div class="marks"></div><div class="knob"></div></div>
+        <span class="time" id="ex-time">0.0 / 0.0 s</span>
+      </div>
+      <div class="ex-foot">
+        <p class="note" id="ex-note">All four policies start from the same randomized scene. Videos at 2× speed; outcomes from the benchmark's success checker.</p>
+      </div>
+    </div>
+  </figure>
+
+  <div class="text reveal" id="lbm-tasks">
+    <h3>Task by task</h3>
+    <p>The gap is not carried by a few tasks: under shift, UniFlow is ahead of the RGB-only policy on every one of the thirteen.</p>
+  </div>
+  <figure class="fig reveal">
+    <div class="panel chartpanel">
+      <div class="chart-head">
+        <div><p class="chart-title">Per-task success rate</p><p class="chart-sub" id="dot-sub">Matched rollouts per task (100 per cell, a few 95–99 after simulator crashes)</p></div>
+        <div class="group" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <div class="seg sm" role="group" aria-label="Condition" id="dot-cond">
+            <button aria-pressed="false" data-cond="IN">In-domain</button>
+            <button aria-pressed="true" data-cond="DS">Domain shift</button>
+          </div>
+          <button class="chip-btn" id="dot-sort" aria-pressed="false">Sort by UniFlow</button>
+          <button class="tablebtn" data-table="dots" aria-pressed="false">Table</button>
+        </div>
+      </div>
+      <ul class="legend" id="dot-legend"></ul>
+      <div class="chart dotplot" id="dots"></div>
+      <p class="note" id="dot-note" style="margin:14px 0 0"></p>
+    </div>
+  </figure>
+  <figure class="fig wide reveal">
+    <div class="wall" id="wall"></div>
+    <figcaption><b>Figure 3.</b> UniFlow under domain shift on all 13 tasks, one rollout each from the matched scenes used in the paper's qualitative figures, at 2× speed. Click a clip to compare it with the other policies.</figcaption>
+  </figure>
+
+  <div class="text reveal" id="shift">
+    <h3>One shift at a time</h3>
+    <p>The full shift stacks several perturbations, and a camera-frame pointmap could plausibly be fragile to camera motion. Re-running UniFlow with one axis at a time on the same scenes shows otherwise: no single axis, the camera included, costs it more than a few points. Drag the divider to compare a nominal rollout with a shifted one.</p>
+  </div>
+  <figure class="fig wide reveal">
+    <div class="panel shiftlab" id="shiftlab">
+      <div class="sl-stage" id="sl-stage">
+        <video class="bot" muted playsinline preload="none" aria-label="Nominal rollout"></video>
+        <video class="top" muted playsinline preload="none" aria-label="Shifted rollout"></video>
+        <div class="lbl l"><span class="nm">Nominal</span><span class="badge pop" id="sl-b0"></span></div>
+        <div class="lbl r"><span class="nm" id="sl-axname">Texture</span><span class="badge pop" id="sl-b1"></span></div>
+        <div class="sl-handle" id="sl-handle" role="slider" tabindex="0" aria-label="Compare position" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"><span><svg><use href="#i-lr"/></svg></span></div>
+        <div class="spinner"><i></i></div>
+      </div>
+      <div class="sl-side">
+        <div>
+          <p class="minihead">Task</p>
+          <select id="sl-task" aria-label="Task"></select>
+        </div>
+        <div>
+          <p class="minihead">Shift axis</p>
+          <div class="axis-tabs" role="group" aria-label="Shift axis" id="sl-axes"></div>
+        </div>
+        <p class="sl-meta" id="sl-meta"></p>
+      </div>
+      <div class="sl-foot">
+        <div class="sl-bars">
+          <p class="chart-title">UniFlow, average over 13 tasks</p>
+          <p class="chart-sub" style="margin-bottom:8px">Success rate (%) with one shift axis at a time</p>
+          <div class="chart" id="sl-chart"></div>
+        </div>
+        <p class="note">Every single axis stays within a few points of the in-domain average, including camera pose and intrinsics, and the full combined shift is no worse than the weakest single axis.</p>
+      </div>
+    </div>
+  </figure>
+</section>
+
+<!-- ======================================================= ROBOTWIN -->
+<section class="sec" id="robotwin">
+  <div class="text reveal">
+    <p class="eyebrow">Simulation · RoboTwin 2.0</p>
+    <h2>One checkpoint, five bimanual tasks</h2>
+    <p>RoboTwin 2.0 randomizes scene appearance, object placement and lighting across rollouts. Each method trains one multi-task checkpoint on 100 demonstrations per task: π<sub>0.5</sub> is fine-tuned on them from its large-scale robot data pretraining, while UniFlow has no robot data pretraining, only off-the-shelf pretrained encoders. UniFlow still has the best average, ahead of both the generalist VLA π<sub>0.5</sub> and the 3D policy ManiFlow, and it is best of the three on Handover block, Lift pot and, narrowly, Move can pot, which suggests its edge is on tasks that need precise 3D placement.</p>
+  </div>
+  <figure class="fig reveal">
+    <div class="panel chartpanel">
+      <div class="chart-head">
+        <div><p class="chart-title">RoboTwin multi-task success rate (%)</p><p class="chart-sub">100 rollouts per task · UniFlow and ManiFlow use the head camera, π<sub>0.5</sub> the head and both wrist cameras</p></div>
+        <button class="tablebtn" data-table="rt" aria-pressed="false">Table</button>
+      </div>
+      <ul class="legend" id="rt-legend"></ul>
+      <div class="chart" id="rt-chart"></div>
+    </div>
+  </figure>
+</section>
+
+<!-- ======================================================= REAL WORLD -->
+<section class="sec" id="real">
+  <div class="text reveal">
+    <p class="eyebrow">Real world · bimanual YAM</p>
+    <h2>On a real robot</h2>
+    <p>One multi-task UniFlow policy, trained on 191 teleoperated demonstrations (about an hour) across four rack tasks, against π<sub>0.5</sub> fine-tuned on the same data. Apart from its off-the-shelf pretrained encoders, UniFlow has seen no robot data beyond these demonstrations; π<sub>0.5</sub> starts from large-scale robot data pretraining. UniFlow reads a ZED 2i head camera and two ZED M wrist cameras, with pointmaps from on-device stereo depth. It reaches a higher average task score than π<sub>0.5</sub>, and the difference is clearest where geometry matters most: passing a thin plate from one arm to the other.</p>
+  </div>
+  <figure class="fig wide reveal">
+    <div class="panel rw-feature" id="rw-feature">
+      <div class="rw-feature-head">
+        <p class="minihead">Plate Handoff · same task, same demonstrations</p>
+        <p class="note">π<sub>0.5</sub> often misses the thin plate edge during the transfer and drops it; UniFlow hands the plate off and racks it.</p>
+      </div>
+      <div class="rw-pair" id="rw-pair"></div>
+    </div>
+  </figure>
+  <figure class="fig wide reveal">
+    <div class="rw-reel" id="rw-reel"></div>
+    <figcaption><b>Figure 4.</b> UniFlow on all four tasks (Plate Handoff, Plate Placement, Cup Stacking, Spoon Sort), run autonomously by one multi-task checkpoint, at 2× speed and trimmed to the task. Click a clip to enlarge it. Rollouts are scored by a human evaluator with a partial-credit rubric; the per-task results are in the paper.</figcaption>
+  </figure>
+</section>
+
+<!-- ======================================================= ABLATIONS -->
+<section class="sec" id="ablations">
+  <div class="text reveal">
+    <h2>What makes it work</h2>
+    <p>Two ablations test the idea of treating 3D as an image: the pointmap stream beats point-cloud encoders, pretrained or not, and its 2D pretraining matters, since the same encoder started from random weights does much worse.</p>
+  </div>
+  <div class="abl">
+    <div class="card reveal">
+      <div class="chart-head" style="margin-bottom:6px"><h3>Pointmaps beat point-cloud encoders</h3>
+        <div class="seg sm" role="group" aria-label="Experiment" id="enc-tab"><button aria-pressed="true" data-k="paper">Lift Pot</button><button aria-pressed="false" data-k="reb">+ Sonata</button></div></div>
+      <p id="enc-desc">Only the geometry stream is swapped; the RGB stream, backbone, objective and action head stay fixed. Single-task RoboTwin Lift Pot, 50 demos, 100 rollouts.</p>
+      <div class="chart" id="enc-chart"></div>
+      <p class="note foot" id="enc-foot"></p>
+    </div>
+    <div class="card reveal">
+      <h3>2D pretraining transfers to geometry</h3>
+      <p>Same architecture, data and compute; only the initialization of the ConvNeXt V2 pointmap encoder changes. Single-task Put red bell pepper in bin (LBM, in-domain).</p>
+      <div class="chart" id="pre-chart"></div>
+      <p class="note foot">An image-shaped 3D input lets the geometry encoder start from pretrained 2D weights; starting the same encoder from random weights costs a large part of the policy's success.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================= CONCLUSION -->
+<section class="sec" id="conclusion">
+  <div class="text reveal">
+    <h2>Conclusion</h2>
+    <p>UniFlow represents 3D observations as pointmaps so that pretrained 2D backbones encode both RGB and geometry, and fuses the two streams with per-modality modulation. Across the LBM benchmark it holds its in-domain performance under domain shift, where an RGB-only policy does not, and with no robot data pretraining it outperforms the large-scale pretrained π<sub>0.5</sub> on average in RoboTwin and on four real-world bimanual tasks. Treating 3D as an image is a simple way to bring large-scale 2D pretraining to robust multi-modal robot policies.</p>
+  </div>
+</section>
+
+<!-- ======================================================= BIBTEX -->
+<section class="sec" id="bibtex">
+  <div class="text reveal">
+    <h2>BibTeX</h2>
+    <div class="bib">
+      <button class="copy" id="copybib"><svg><use href="#i-copy"/></svg><span>Copy</span></button>
+<pre id="bibtext">@inproceedings{yan2026uniflow,
+  title     = {UniFlow: A Unified Multi-Modal Policy for Robot Manipulation},
+  author    = {Yan, Ge and Iwase, Shun and Fan, Yuzhi and Fox, Dieter and Zakharov, Sergey and Liu, Katherine},
+  booktitle = {Conference on Robot Learning (CoRL)},
+  year      = {2026}
+}</pre>
+    </div>
+  </div>
+</section>
+</div>
+</div>
+</main>
+
+<footer class="footer">
+  <div class="footer-in">
+    <span>UniFlow · Conference on Robot Learning 2026</span>
+    <span>Fonts under the SIL OFL: <a href="assets/fonts/licenses/SourceSerif4-OFL.txt">Source Serif 4</a>, <a href="assets/fonts/licenses/JetBrainsMono-OFL.txt">JetBrains Mono</a> · Last updated November 2026</span>
+  </div>
+</footer>
+
+<dialog class="lb" id="lightbox" aria-label="Rollout video">
+  <video id="lb-video" controls playsinline muted></video>
+  <div class="lb-bar">
+    <div class="t" id="lb-title"></div>
+    <div class="g">
+      <button class="iconbtn" id="lb-prev" aria-label="Previous rollout"><svg><use href="#i-prev"/></svg></button>
+      <button class="iconbtn" id="lb-next" aria-label="Next rollout"><svg><use href="#i-next"/></svg></button>
+      <button class="iconbtn" id="lb-close" aria-label="Close"><svg><use href="#i-close"/></svg></button>
+    </div>
+  </div>
+</dialog>
+<div class="tip" id="tip" role="tooltip"></div>
+</body>
+</html>

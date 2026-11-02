@@ -1,0 +1,106 @@
+{
+ "robotwin": {
+  "tasks": [
+   "Handover block",
+   "Lift pot",
+   "Move can pot",
+   "Pick dual bottles",
+   "Turn switch",
+   "Average"
+  ],
+  "pi05": [
+   28.0,
+   56.0,
+   24.0,
+   34.0,
+   40.0,
+   36.4
+  ],
+  "maniflow": [
+   43.0,
+   22.0,
+   19.0,
+   54.0,
+   28.0,
+   33.2
+  ],
+  "uniflow": [
+   54.0,
+   67.0,
+   27.0,
+   47.0,
+   27.0,
+   44.4
+  ]
+ },
+ "encoder_liftpot": [
+  {
+   "name": "PointNet++",
+   "sr": 8,
+   "init": "scratch"
+  },
+  {
+   "name": "Uni3D",
+   "sr": 22,
+   "init": "pretrained"
+  },
+  {
+   "name": "RandLA-Net",
+   "sr": 42,
+   "init": "scratch"
+  },
+  {
+   "name": "Pointmap + ConvNeXt V2",
+   "sr": 83,
+   "init": "pretrained",
+   "ours": true
+  }
+ ],
+ "pretrain": {
+  "task": "PutRedBellPepperInBin (LBM)",
+  "pretrained": 65.0,
+  "random": 44.0
+ },
+ "encoder_extra": {
+  "tasks": [
+   "Adjust bottle",
+   "Lift pot",
+   "Avg"
+  ],
+  "rows": [
+   {
+    "name": "ManiFlow (point cloud, from scratch)",
+    "v": [
+     77,
+     31,
+     54.0
+    ]
+   },
+   {
+    "name": "UniFlow + Sonata (pretrained)",
+    "v": [
+     78,
+     32,
+     55.0
+    ]
+   },
+   {
+    "name": "UniFlow + PointNet (from scratch)",
+    "v": [
+     77,
+     43,
+     60.0
+    ]
+   },
+   {
+    "name": "UniFlow (pointmap + ConvNeXt V2)",
+    "v": [
+     99,
+     80,
+     89.5
+    ],
+    "ours": true
+   }
+  ]
+ }
+}

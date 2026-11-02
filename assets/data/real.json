@@ -1,0 +1,19 @@
+{
+ "featured": {
+  "task": "Plate Handoff",
+  "clips": {
+   "pi05": {"video": "assets/videos/real/plate-handoff/pi05-05.mp4", "end": 30.0, "caption": "Drops the plate during the handoff", "success": false},
+   "uniflow": {"video": "assets/videos/real/plate-handoff/uniflow-14.mp4", "end": 8.3, "caption": "Hands the plate off and racks it", "success": true}
+  }
+ },
+ "reel": [
+  {"task": "Plate Handoff", "video": "assets/videos/real/highlights/plate-handoff-17.mp4"},
+  {"task": "Plate Placement", "video": "assets/videos/real/highlights/plate-placement-19.mp4"},
+  {"task": "Plate Handoff", "video": "assets/videos/real/highlights/plate-handoff-11.mp4"},
+  {"task": "Cup Stacking", "video": "assets/videos/real/highlights/cup-stacking-19.mp4"},
+  {"task": "Spoon Sort", "video": "assets/videos/real/highlights/spoon-sort-04.mp4"},
+  {"task": "Plate Handoff", "video": "assets/videos/real/highlights/plate-handoff-20.mp4"},
+  {"task": "Plate Placement", "video": "assets/videos/real/highlights/plate-placement-14.mp4"},
+  {"task": "Plate Handoff", "video": "assets/videos/real/highlights/plate-handoff-05.mp4"}
+ ]
+}
